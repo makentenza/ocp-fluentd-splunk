@@ -1,5 +1,22 @@
-apiVersion: "v1"
-kind: "BuildConfig"
+apiVersion: v1
+kind: Template
+labels:
+  template: fluentd-splunk-forwarder-template
+message: A Fluentd Splunk Forwarder has been created
+metadata:
+  annotations:
+    description: Fluentd Splunk Forwarder Agent
+    iconClass: icon-jenkins
+    tags: instant-app,fluentd-splunk
+  name: fluentd-splunk-forwarder-template
+  namespace: openshift
+objects:
+- apiVersion: "v1"
+  kind: "ImageStream"
+  metadata:
+    name: "fluentd-splunk-forwarder"
+- apiVersion: "v1"
+  kind: "BuildConfig"
   metadata:
     name: "fluentd-splunk-forwarder"
   spec:
