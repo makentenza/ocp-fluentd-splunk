@@ -1,0 +1,22 @@
+apiVersion: "v1"
+kind: "BuildConfig"
+  metadata:
+    name: "fluentd-splunk-forwarder"
+  spec:
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+    source:
+      type: Git
+      git:
+        uri: https://github.com/makentenza/ocp-fluentd-splunk.git
+    strategy:
+      type: "Docker"
+      dockerStrategy:
+        from:
+          kind: "DockerImage"
+          name: "registry.access.redhat.com/openshift3/logging-fluentd:3.3.1"
+    output:
+      to:
+        kind: "ImageStreamTag"
+        name: "fluentd-splunk-forwarder:latest"
