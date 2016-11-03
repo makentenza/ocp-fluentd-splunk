@@ -8,6 +8,8 @@ LABEL io.k8s.description="Fluentd capability to forward info to Splunk" \
       io.k8s.display-name="Fluentd to Splunk Forwarder" \
       io.openshift.tags="fluentd-splunk"
 
+RUN yum -y install telnet net-tools --disablerepo=* --enablerepo=rhel-7-server-rpms && yum clean all
+
 WORKDIR /opt/app-root/src/
 COPY src/fluent-plugin-splunk-ex.gemspec .
 RUN gem install fluent-plugin-splunk-ex
