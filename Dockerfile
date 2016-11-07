@@ -14,5 +14,6 @@ WORKDIR /opt/app-root/src/
 COPY src/fluent-plugin-splunk-ex.gemspec .
 RUN gem install fluent-plugin-splunk-ex
 COPY src/splunk.cfg /etc/fluent/configs.d/
+COPY src/run.sh .
 
 CMD ["sh","run.sh"]
