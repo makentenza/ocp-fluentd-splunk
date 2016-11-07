@@ -54,8 +54,7 @@ else
     # create empty files for the ES copy config
     echo > $CFG_DIR/dynamic/es-copy-config.conf
     echo > $CFG_DIR/dynamic/es-ops-copy-config.conf
-    cp $CFG_DIR/splunk.cfg $CFG_DIR/dynamic/
 fi
 
 
-fluentd $fluentdargs
+fluentd -vv &> /var/log/fluentd.log
