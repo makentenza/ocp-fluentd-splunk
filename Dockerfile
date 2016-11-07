@@ -13,10 +13,7 @@ RUN yum -y install telnet net-tools ruby-devel --disablerepo=* --enablerepo=rhel
 WORKDIR /opt/app-root/src/
 COPY src/fluent-plugin-splunk-ex.gemspec .
 COPY src/fluent.conf /etc/fluent/
-#COPY src/fluent-plugin-splunk-ex.gemspec .
+COPY serc/splunk.cfg /etc/fluent/configs.d/
 RUN gem install fluent-plugin-splunk-ex
-#COPY src/splunk.cfg /etc/fluent/configs.d/
-
-
 
 CMD ["sh","run.sh"]
