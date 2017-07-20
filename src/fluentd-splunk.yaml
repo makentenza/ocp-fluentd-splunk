@@ -9,7 +9,6 @@ metadata:
     iconClass: icon-jenkins
     tags: instant-app,fluentd-splunk
   name: fluentd-splunk-forwarder-template
-  namespace: openshift
 objects:
 - apiVersion: "v1"
   kind: "ImageStream"
@@ -47,7 +46,6 @@ objects:
       logging-infra: fluentd
       provider: openshift
     name: logging-fluentd-splunk
-    namespace: logging
   spec:
     selector:
       matchLabels:
