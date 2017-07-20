@@ -147,7 +147,7 @@ objects:
             readOnly: true
         dnsPolicy: ClusterFirst
         nodeSelector:
-          logging-infra-fluentd: "true"
+          logging-infra-fluentd-splunk: "true"
         restartPolicy: Always
         securityContext: {}
         serviceAccount: aggregated-logging-fluentd
