@@ -1,0 +1,184 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: fluentd-splunk-forwarder-template
+message: A Fluentd Splunk Forwarder has been created
+metadata:
+  annotations:
+    description: Fluentd Splunk Forwarder Agent
+    iconClass: icon-jenkins
+    tags: instant-app,fluentd-splunk
+  name: fluentd-splunk-forwarder-template
+  namespace: openshift
+objects:
+- apiVersion: "v1"
+  kind: "ImageStream"
+  metadata:
+    name: "fluentd-splunk-forwarder"
+- apiVersion: "v1"
+  kind: "BuildConfig"
+  metadata:
+    name: "fluentd-splunk-forwarder"
+  spec:
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+    source:
+      type: Git
+      git:
+        uri: https://github.com/makentenza/ocp-fluentd-splunk.git
+        ref: ocp-v3.5
+    strategy:
+      type: "Docker"
+      dockerStrategy:
+        from:
+          kind: "DockerImage"
+          name: "registry.access.redhat.com/openshift3/logging-fluentd:3.5.0"
+    output:
+      to:
+        kind: "ImageStreamTag"
+        name: "fluentd-splunk-forwarder:v3.5"
+- apiVersion: v1
+items:
+- apiVersion: extensions/v1beta1
+  kind: DaemonSet
+  metadata:
+    generation: 1
+    labels:
+      component: fluentd
+      logging-infra: fluentd
+      provider: openshift
+    name: logging-fluentd
+    namespace: logging
+  spec:
+    selector:
+      matchLabels:
+        component: fluentd
+        provider: openshift
+    template:
+      metadata:
+        labels:
+          component: fluentd
+          logging-infra: fluentd
+          provider: openshift
+        name: fluentd-elasticsearch
+      spec:
+        containers:
+        - env:
+          - name: SPLUNK_HOST
+            value: xxxxxxxxxxxxxx
+          - name: SPLUNK_PORT
+            value: xxxx
+          - name: K8S_HOST_URL
+            value: https://kubernetes.default.svc.cluster.local
+          - name: ES_HOST
+            value: logging-es
+          - name: ES_PORT
+            value: "9200"
+          - name: ES_CLIENT_CERT
+            value: /etc/fluent/keys/cert
+          - name: ES_CLIENT_KEY
+            value: /etc/fluent/keys/key
+          - name: ES_CA
+            value: /etc/fluent/keys/ca
+          - name: OPS_HOST
+            value: logging-es
+          - name: OPS_PORT
+            value: "9200"
+          - name: OPS_CLIENT_CERT
+            value: /etc/fluent/keys/cert
+          - name: OPS_CLIENT_KEY
+            value: /etc/fluent/keys/key
+          - name: OPS_CA
+            value: /etc/fluent/keys/ca
+          - name: ES_COPY
+            value: "false"
+          - name: ES_COPY_HOST
+          - name: ES_COPY_PORT
+          - name: ES_COPY_SCHEME
+            value: https
+          - name: ES_COPY_CLIENT_CERT
+          - name: ES_COPY_CLIENT_KEY
+          - name: ES_COPY_CA
+          - name: ES_COPY_USERNAME
+          - name: ES_COPY_PASSWORD
+          - name: OPS_COPY_HOST
+          - name: OPS_COPY_PORT
+          - name: OPS_COPY_SCHEME
+            value: https
+          - name: OPS_COPY_CLIENT_CERT
+          - name: OPS_COPY_CLIENT_KEY
+          - name: OPS_COPY_CA
+          - name: OPS_COPY_USERNAME
+          - name: OPS_COPY_PASSWORD
+          - name: USE_JOURNAL
+          - name: JOURNAL_SOURCE
+          - name: JOURNAL_READ_FROM_HEAD
+          image: 172.30.154.146:5000/logging/fluentd-splunk-forwarder:v3.5
+          imagePullPolicy: Always
+          name: fluentd-elasticsearch
+          resources:
+            limits:
+              cpu: 100m
+              memory: 512Mi
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /run/log/journal
+            name: runlogjournal
+          - mountPath: /var/log
+            name: varlog
+          - mountPath: /var/lib/docker/containers
+            name: varlibdockercontainers
+            readOnly: true
+          - mountPath: /etc/fluent/configs.d/user
+            name: config
+            readOnly: true
+          - mountPath: /etc/fluent/keys
+            name: certs
+            readOnly: true
+          - mountPath: /etc/docker-hostname
+            name: dockerhostname
+            readOnly: true
+          - mountPath: /etc/localtime
+            name: localtime
+            readOnly: true
+          - mountPath: /etc/sysconfig/docker
+            name: dockercfg
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          logging-infra-fluentd: "true"
+        restartPolicy: Always
+        securityContext: {}
+        serviceAccount: aggregated-logging-fluentd
+        serviceAccountName: aggregated-logging-fluentd
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /run/log/journal
+          name: runlogjournal
+        - hostPath:
+            path: /var/log
+          name: varlog
+        - hostPath:
+            path: /var/lib/docker/containers
+          name: varlibdockercontainers
+        - configMap:
+            defaultMode: 420
+            name: logging-fluentd
+          name: config
+        - name: certs
+          secret:
+            defaultMode: 420
+            secretName: logging-fluentd
+        - hostPath:
+            path: /etc/hostname
+          name: dockerhostname
+        - hostPath:
+            path: /etc/localtime
+          name: localtime
+        - hostPath:
+            path: /etc/sysconfig/docker
+          name: dockercfg
