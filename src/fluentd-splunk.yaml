@@ -48,7 +48,7 @@ items:
       component: fluentd
       logging-infra: fluentd
       provider: openshift
-    name: logging-fluentd
+    name: logging-fluentd-splunk
     namespace: logging
   spec:
     selector:
