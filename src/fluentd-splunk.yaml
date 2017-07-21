@@ -69,14 +69,14 @@ objects:
       ##
 
       ## matches for splunk plugin
-      <match pattern>
+      <match **>
         type splunk_ex
         host ${SPLUNK_HOST}
         port ${SPLUNK_PORT}
         output_format json
       </match>
       ##
-      
+
       ## matches
         @include configs.d/openshift/output-pre-*.conf
         @include configs.d/openshift/output-operations.conf
@@ -145,9 +145,9 @@ objects:
         containers:
         - env:
           - name: SPLUNK_HOST
-            value: xxxxxxxxxxxxxx
+            value: localhost
           - name: SPLUNK_PORT
-            value: xxxx
+            value: 9777
           - name: K8S_HOST_URL
             value: https://kubernetes.default.svc.cluster.local
           - name: ES_HOST
